@@ -1,18 +1,30 @@
 import Sidebar from '@/Components/Sidebar';
 import { usePage } from '@inertiajs/react';
-import { PropsWithChildren, ReactNode, useState } from 'react';
+import { PropsWithChildren, ReactNode, useState, useEffect } from 'react';
 import { Menu, Bell } from 'lucide-react';
 import Dropdown from '@/Components/Dropdown';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function Authenticated({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
-    const user = usePage().props.auth.user;
+    const { auth, flash } = usePage().props as any;
+    const user = auth.user;
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+
+    useEffect(() => {
+        if (flash.success) {
+            toast.success(flash.success);
+        }
+        if (flash.error) {
+            toast.error(flash.error);
+        }
+    }, [flash]);
 
     return (
         <div className="flex h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
+            <Toaster position="top-right" />
             {/* Sidebar for Desktop */}
             <div className="hidden md:block">
                 <Sidebar />
