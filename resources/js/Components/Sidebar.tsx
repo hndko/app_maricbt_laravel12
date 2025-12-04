@@ -1,15 +1,70 @@
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutDashboard, BookOpen, GraduationCap, Users, LogOut, MonitorPlay } from 'lucide-react';
+import { LayoutDashboard, BookOpen, GraduationCap, Users, LogOut, MonitorPlay, FileQuestion, Calendar, Monitor } from 'lucide-react';
 import { clsx } from 'clsx';
 
 export default function Sidebar() {
-    const { url } = usePage();
+    const { url, props } = usePage();
+    const { auth } = props as any;
+    const user = auth.user;
+    const roles = user.roles.map((role: any) => role.name);
 
-    const links = [
-        { name: 'Dashboard', href: route('dashboard'), icon: LayoutDashboard, active: url.startsWith('/dashboard') },
-        { name: 'Classrooms', href: route('classrooms.index'), icon: Users, active: url.startsWith('/classrooms') },
-        { name: 'Subjects', href: route('subjects.index'), icon: BookOpen, active: url.startsWith('/subjects') },
+    const hasRole = (roleNames: string[]) => {
+        return roles.some((role: string) => roleNames.includes(role));
+    };
+
+    const allLinks = [
+        {
+            name: 'Dashboard',
+            href: route('dashboard'),
+            icon: LayoutDashboard,
+            active: url.startsWith('/dashboard'),
+            roles: ['Superadmin', 'Admin', 'Teacher', 'Proctor', 'Student']
+        },
+        {
+            name: 'Classrooms',
+            href: route('classrooms.index'),
+            icon: Users,
+            active: url.startsWith('/classrooms'),
+            roles: ['Superadmin', 'Admin']
+        },
+        {
+            name: 'Subjects',
+            href: route('subjects.index'),
+            icon: BookOpen,
+            active: url.startsWith('/subjects'),
+            roles: ['Superadmin', 'Admin']
+        },
+        {
+            name: 'Questions',
+            href: route('questions.index'),
+            icon: FileQuestion,
+            active: url.startsWith('/questions'),
+            roles: ['Superadmin', 'Admin', 'Teacher']
+        },
+        {
+            name: 'Exams',
+            href: route('exams.index'),
+            icon: Calendar,
+            active: url.startsWith('/exams'),
+            roles: ['Superadmin', 'Admin', 'Teacher']
+        },
+        {
+            name: 'My Exams',
+            href: route('student.exams.index'),
+            icon: FileQuestion,
+            active: url.startsWith('/student/exams'),
+            roles: ['Student']
+        },
+        {
+            name: 'Monitoring',
+            href: route('proctor.exams.index'),
+            icon: Monitor,
+            active: url.startsWith('/proctor/exams'),
+            roles: ['Proctor', 'Superadmin', 'Admin']
+        },
     ];
+
+    const links = allLinks.filter(link => hasRole(link.roles));
 
     return (
         <div className="flex h-screen w-64 flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
@@ -42,6 +97,17 @@ export default function Sidebar() {
             </nav>
 
             <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+                <div className="mb-4 px-3">
+                    <div className="text-xs font-semibold text-gray-500 uppercase dark:text-gray-400">
+                        Logged in as
+                    </div>
+                    <div className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                        {user.name}
+                    </div>
+                    <div className="truncate text-xs text-gray-500 dark:text-gray-400">
+                        {roles.join(', ')}
+                    </div>
+                </div>
                 <Link
                     href={route('logout')}
                     method="post"
