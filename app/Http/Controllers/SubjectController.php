@@ -11,11 +11,14 @@ class SubjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, $search = null)
     {
         $query = Subject::query();
 
-        if ($request->has('search')) {
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('code', 'like', '%' . $search . '%');
+        } elseif ($request->has('search')) {
             $query->where('name', 'like', '%' . $request->search . '%')
                   ->orWhere('code', 'like', '%' . $request->search . '%');
         }
@@ -24,7 +27,7 @@ class SubjectController extends Controller
 
         return Inertia::render('Subjects/Index', [
             'subjects' => $subjects,
-            'filters' => $request->only(['search']),
+            'filters' => ['search' => $search ?? $request->search],
         ]);
     }
 

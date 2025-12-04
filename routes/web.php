@@ -23,7 +23,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::get('classrooms/search/{search}', [\App\Http\Controllers\ClassroomController::class, 'index'])->name('classrooms.search');
     Route::resource('classrooms', \App\Http\Controllers\ClassroomController::class);
+
+    Route::get('subjects/search/{search}', [\App\Http\Controllers\SubjectController::class, 'index'])->name('subjects.search');
     Route::resource('subjects', \App\Http\Controllers\SubjectController::class);
 });
 

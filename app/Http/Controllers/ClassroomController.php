@@ -11,12 +11,15 @@ class ClassroomController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, $search = null)
     {
         $query = Classroom::query();
 
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('level', 'like', '%' . $search . '%');
+        } elseif ($request->has('search')) {
+             $query->where('name', 'like', '%' . $request->search . '%')
                   ->orWhere('level', 'like', '%' . $request->search . '%');
         }
 
@@ -24,7 +27,7 @@ class ClassroomController extends Controller
 
         return Inertia::render('Classrooms/Index', [
             'classrooms' => $classrooms,
-            'filters' => $request->only(['search']),
+            'filters' => ['search' => $search ?? $request->search],
         ]);
     }
 

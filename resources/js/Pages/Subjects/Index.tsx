@@ -15,6 +15,8 @@ interface Props {
     subjects: {
         data: Subject[];
         links: any[];
+        current_page: number;
+        per_page: number;
     };
     filters: {
         search?: string;
@@ -26,10 +28,16 @@ export default function Index({ subjects, filters }: Props) {
     const [debouncedSearch] = useDebounce(search, 300);
 
     useEffect(() => {
-        if (debouncedSearch !== filters.search) {
+        if (debouncedSearch) {
+            router.get(
+                route('subjects.search', debouncedSearch),
+                {},
+                { preserveState: true, replace: true }
+            );
+        } else if (filters.search) {
             router.get(
                 route('subjects.index'),
-                { search: debouncedSearch },
+                {},
                 { preserveState: true, replace: true }
             );
         }
@@ -78,6 +86,7 @@ export default function Index({ subjects, filters }: Props) {
                     <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
                         <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
+                                <th scope="col" className="px-6 py-3 w-16">No</th>
                                 <th scope="col" className="px-6 py-3">Code</th>
                                 <th scope="col" className="px-6 py-3">Name</th>
                                 <th scope="col" className="px-6 py-3 text-right">Actions</th>
@@ -85,8 +94,11 @@ export default function Index({ subjects, filters }: Props) {
                         </thead>
                         <tbody>
                             {subjects.data.length > 0 ? (
-                                subjects.data.map((subject) => (
+                                subjects.data.map((subject, index) => (
                                     <tr key={subject.id} className="border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600">
+                                        <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                                            {(subjects.current_page - 1) * subjects.per_page + index + 1}
+                                        </td>
                                         <td className="px-6 py-4 font-mono text-xs font-medium text-gray-500 dark:text-gray-400">
                                             {subject.code}
                                         </td>
@@ -113,7 +125,7 @@ export default function Index({ subjects, filters }: Props) {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={3} className="px-6 py-4 text-center">
+                                    <td colSpan={4} className="px-6 py-4 text-center">
                                         No subjects found.
                                     </td>
                                 </tr>
