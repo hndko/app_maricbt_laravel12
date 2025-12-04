@@ -28,6 +28,12 @@ Route::middleware('auth')->group(function () {
 
     Route::get('subjects/search/{search}', [\App\Http\Controllers\SubjectController::class, 'index'])->name('subjects.search');
     Route::resource('subjects', \App\Http\Controllers\SubjectController::class);
+
+    Route::resource('questions', \App\Http\Controllers\QuestionController::class);
+    Route::post('questions/import', [\App\Http\Controllers\QuestionController::class, 'import'])->name('questions.import');
+    Route::get('questions/export', [\App\Http\Controllers\QuestionController::class, 'export'])->name('questions.export');
+
+    Route::resource('exams', \App\Http\Controllers\ExamController::class);
 });
 
 require __DIR__.'/auth.php';
